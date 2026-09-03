@@ -41,6 +41,18 @@
 # `dsh.client` rows are the browser roster the modules node half scans into
 # window.__DSH_BOOT__; the modules row is simultaneously a host row.
 - insert:
+    # Product-account identity and local application-session store. HTTP
+    # consumers can resolve `ctx.multiUser` for password or registered
+    # third-party Cookie authentication; the raw Cookie never enters this
+    # provider's durable store.
+    - id: multi-user
+      name: '@deepseek-ai/dsh-multi-user-local'
+
+    # Exact `/api/auth/*` routes and the product-session Cookie consumer for
+    # the account identity provider.
+    - id: multi-user-controller
+      name: '@deepseek-ai/dsh-api-multi-user-controller'
+
     # Host-owned opt-in sampled when a new Web session receives its preset
     # delegation tools. The Plugins page edits this settings namespace.
     - id: subagent-model-selection-settings
@@ -182,6 +194,11 @@
 
     - id: ui-layout
       name: '@deepseek-ai/dsh-client-ui-layout'
+
+    # Account-session check, password/third-party Cookie login page, and the
+    # authenticated avatar/logout row beside the sidebar settings action.
+    - id: ui-multi-user
+      name: '@deepseek-ai/dsh-client-ui-multi-user'
 
     - id: ui-renderer
       name: '@deepseek-ai/dsh-client-ui-renderer'

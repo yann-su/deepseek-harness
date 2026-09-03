@@ -224,6 +224,10 @@
       "@deepseek-ai/dsh-experimental-code-runtime-python": ["./packages/experimental/code-runtime-python/src"],
       "@deepseek-ai/dsh-util-crypto": ["./packages/util/crypto/src"],
       "@deepseek-ai/dsh-util-values": ["./packages/util/values/src"],
+      // Group-prefixed package names do not match their directory suffix, so
+      // the generator cannot derive these two aliases.
+      "@deepseek-ai/dsh-api-multi-user-controller": ["./packages/api/multi-user-controller/src"],
+      "@deepseek-ai/dsh-client-ui-multi-user": ["./packages/client/ui-multi-user/src"],
       // util/ folders are role-named without the util- prefix their npm names carry,
       // so these aliases stay hand-written like dsh-util-crypto above.
       "@deepseek-ai/dsh-util-time": ["./packages/util/time/src"],
@@ -302,6 +306,8 @@
       "@deepseek-ai/dsh-lsp-stdio": ["./packages/lsp/lsp-stdio/src"],
       "@deepseek-ai/dsh-mcp-client": ["./packages/mcp/mcp-client/src"],
       "@deepseek-ai/dsh-message-feedback": ["./packages/feedback/message-feedback/src"],
+      "@deepseek-ai/dsh-multi-user": ["./packages/identity/multi-user/src"],
+      "@deepseek-ai/dsh-multi-user-local": ["./packages/identity/multi-user-local/src"],
       "@deepseek-ai/dsh-native-command": ["./packages/util/native-command/src"],
       "@deepseek-ai/dsh-output-retention": ["./packages/util/output-retention/src"],
       "@deepseek-ai/dsh-permission-presets": ["./packages/interaction/permission-presets/src"],

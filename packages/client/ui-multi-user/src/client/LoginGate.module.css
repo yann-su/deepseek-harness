@@ -1,0 +1,22 @@
+.card {
+  width: min(420px, calc(100vw - 32px));
+  margin-top: 12vh;
+  padding: 32px;
+  border: 1px solid var(--dsw-alias-border-l2);
+  border-radius: 24px;
+  background: var(--dsw-alias-bg-layer-2);
+  box-shadow: var(--dsw-elevation-prominent);
+  color: var(--dsw-alias-label-primary);
+}
+.brand { margin-bottom: 28px; color: var(--dsw-alias-brand-primary); font-size: 16px; font-weight: 600; }
+.title { margin: 0; font-size: 24px; line-height: 32px; }
+.subtitle { margin: 8px 0 24px; color: var(--dsw-alias-label-secondary); font-size: 14px; }
+.tabs { display: flex; gap: 4px; margin-bottom: 18px; border-bottom: 1px solid var(--dsw-alias-border-l3); }
+.tab, .tabActive { padding: 8px 10px; border: 0; border-bottom: 2px solid transparent; background: transparent; color: var(--dsw-alias-label-secondary); cursor: pointer; font-size: 13px; }
+.tabActive { border-bottom-color: var(--dsw-alias-brand-primary); color: var(--dsw-alias-label-primary); }
+.form { display: flex; flex-direction: column; gap: 14px; }
+.label { display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: var(--dsw-alias-label-secondary); }
+.label :global(select), .label :global(textarea) { width: 100%; box-sizing: border-box; border: 1px solid var(--dsw-alias-border-l3); border-radius: 8px; padding: 8px; background: var(--dsw-alias-bg-layer-1); color: var(--dsw-alias-label-primary); font: inherit; }
+.label textarea { min-height: 92px; resize: vertical; }
+.hint, .status { margin: 0; color: var(--dsw-alias-label-tertiary); font-size: 12px; line-height: 18px; }
+.error { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; color: var(--dsw-alias-state-error-primary); font-size: 13px; }

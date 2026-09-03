@@ -63,6 +63,7 @@ type EventReceiverKind = 'context' | 'agent-dispatch' | 'events-service'
 const GROUP_ORDER = [
   'util',
   'attachment',
+  'identity',
   'llm',
   'core',
   'typert',
@@ -255,6 +256,15 @@ const SERVICE_ROLES: ServiceRole[] = [
     implementations: ['credentials-local'],
     consumers: ['api-settings-controller', 'llm-deepseek', 'llm-pi-ai'],
     note: 'Configuration carries references to secrets; providers own the values. Consumers resolve per operation, so a rotated credential reaches the very next request; the settings controller exposes value-free views and write-only storage.',
+  },
+  {
+    key: 'multiUser',
+    pkg: 'multi-user',
+    title: 'Product-account identity and authentication seam',
+    mode: 'seam',
+    implementations: ['multi-user-local'],
+    consumers: ['api-multi-user-controller'],
+    note: 'The seam defines account, Principal, session, password, and third-party Cookie vocabulary; the local provider persists password verifiers and revocable sessions without retaining raw Cookies. HTTP and resource-ownership consumers remain deployment-specific.',
   },
   {
     key: 'authorization',

@@ -1231,6 +1231,80 @@ export const SERVICE_API: readonly ServiceApiEntry[] = [
     ],
   },
   {
+    key: 'multiUser',
+    summary: 'Abstract account/authentication provider.',
+    description: 'Abstract account/authentication provider. It owns the registry of cookie exchangers so a third-party plugin can add an authentication method without coupling the local account store to that provider\'s protocol.',
+    methods: [
+      {
+        signature: 'registerCookieAuthenticator(authenticator: CookieAuthenticator): () => void',
+        description: 'Register one third-party Cookie exchanger. The raw Cookie value is passed only to the exchanger during login and is never retained by this seam.',
+        parameters: [{ name: 'authenticator', description: 'provider id, label, and exchange callback.' }],
+        returns: 'disposer that removes the authenticator.',
+        throws: ['{MultiUserError} code `DUPLICATE_COOKIE_AUTHENTICATOR` when reused.'],
+      },
+      {
+        signature: 'listCookieAuthenticators(): readonly CookieAuthenticatorView[]',
+        description: 'List registered cookie providers without exposing callbacks.',
+        parameters: [],
+        returns: 'public provider ids and labels.',
+      },
+      {
+        signature: 'abstract hasAccounts(): Promise<boolean>',
+        description: 'Whether this home already contains an account.',
+        parameters: [],
+        returns: 'true when at least one account exists.',
+      },
+      {
+        signature: 'abstract createPasswordAccount(input: PasswordAccountInput): Promise<Account>',
+        description: 'Create a local password account.',
+        parameters: [{ name: 'input', description: 'account name, password, and optional display name.' }],
+        returns: 'the public account record.',
+      },
+      {
+        signature: 'abstract loginWithPassword(request: PasswordLoginRequest): Promise<AuthenticationResult>',
+        description: 'Authenticate a local password and create an application session.',
+        parameters: [{ name: 'request', description: 'username, password, and optional expiry.' }],
+        returns: 'the application token, Principal, and public session.',
+      },
+      {
+        signature: 'abstract linkExternalIdentity( accountId: AccountId, providerId: CookieAuthenticatorId, identity: ExternalIdentity, ): Promise<void>',
+        description: 'Link a verified third-party subject to an existing account.',
+        parameters: [{ name: 'accountId', description: 'local account that will own the subject.' }, { name: 'providerId', description: 'registered cookie authenticator id.' }, { name: 'identity', description: 'verified external subject returned by that authenticator.' }],
+        returns: 'resolution after the durable link is committed.',
+      },
+      {
+        signature: 'abstract loginWithCookie(request: CookieLoginRequest): Promise<AuthenticationResult>',
+        description: 'Exchange a third-party Cookie and create or resolve an application session.',
+        parameters: [{ name: 'request', description: 'authenticator id, raw Cookie, and optional expiry.' }],
+        returns: 'the application token, Principal, and public session.',
+      },
+      {
+        signature: 'abstract resolveSession(token: string): Promise<Principal | undefined>',
+        description: 'Resolve an opaque application token to its current Principal.',
+        parameters: [{ name: 'token', description: 'application Cookie value.' }],
+        returns: 'the Principal, or undefined when the token is invalid or expired.',
+      },
+      {
+        signature: 'abstract revokeSession(sessionId: AuthSessionId): Promise<boolean>',
+        description: 'Revoke one session by its public id.',
+        parameters: [{ name: 'sessionId', description: 'session to revoke.' }],
+        returns: 'true when a stored session was removed.',
+      },
+      {
+        signature: 'abstract revokeAllSessions(accountId: AccountId): Promise<number>',
+        description: 'Revoke every session belonging to one account.',
+        parameters: [{ name: 'accountId', description: 'account whose sessions are removed.' }],
+        returns: 'number of sessions removed.',
+      },
+      {
+        signature: 'abstract listSessions(accountId: AccountId): Promise<readonly AuthSessionView[]>',
+        description: 'List non-secret session metadata for one account.',
+        parameters: [{ name: 'accountId', description: 'account whose sessions are listed.' }],
+        returns: 'active session views without tokens.',
+      },
+    ],
+  },
+  {
     key: 'permissionPresets',
     summary: 'Owns the deployment\'s permission presets and their write path.',
     description: 'Owns the deployment\'s permission presets and their write path. Requires a confining `ctx.shell` executor and `ctx.approval`; unmatched knob values are reported as CUSTOM_PRESET, not an error.',
@@ -3357,6 +3431,14 @@ export const EVENT_API: readonly EventApiEntry[] = [
 /** Shapes of every exported type the Service and Event signatures reference (transitively), sorted by name. */
 export const TYPE_API: readonly TypeApiEntry[] = [
   {
+    name: 'Account',
+    declaration: 'export interface Account {\n    readonly id: AccountId;\n    readonly userId: UserId;\n    readonly username: string;\n    readonly displayName: string;\n    readonly createdAt: number;\n}',
+  },
+  {
+    name: 'AccountId',
+    declaration: 'export type AccountId = Branded<\'AccountId\'>;',
+  },
+  {
     name: 'AdapterRegistrationHandle',
     declaration: 'export interface AdapterRegistrationHandle {\n    (): void;\n    replace(providers: string[]): void;\n}',
   },
@@ -3501,6 +3583,14 @@ export const TYPE_API: readonly TypeApiEntry[] = [
     declaration: 'export type AttachmentId = Branded<\'AttachmentId\'>;',
   },
   {
+    name: 'AuthenticationResult',
+    declaration: 'export interface AuthenticationResult {\n    readonly token: string;\n    readonly principal: Principal;\n    readonly session: AuthSessionView;\n}',
+  },
+  {
+    name: 'AuthMethod',
+    declaration: 'export type AuthMethod = \'password\' | \'cookie\';',
+  },
+  {
     name: 'AuthorizationEntry',
     declaration: 'export interface AuthorizationEntry {\n    key: CredentialKey;\n    label: string;\n    methods: readonly AuthorizationMethod[];\n    inFlight: boolean;\n}',
   },
@@ -3547,6 +3637,14 @@ export const TYPE_API: readonly TypeApiEntry[] = [
   {
     name: 'AuthorizationStatus',
     declaration: 'export type AuthorizationStatus = \'authorized\' | \'cancelled\';',
+  },
+  {
+    name: 'AuthSessionId',
+    declaration: 'export type AuthSessionId = Branded<\'AuthSessionId\'>;',
+  },
+  {
+    name: 'AuthSessionView',
+    declaration: 'export interface AuthSessionView {\n    readonly id: AuthSessionId;\n    readonly accountId: AccountId;\n    readonly userId: UserId;\n    readonly method: AuthMethod;\n    readonly providerId?: CookieAuthenticatorId;\n    readonly createdAt: number;\n    readonly expiresAt: number;\n    readonly lastSeenAt: number;\n}',
   },
   {
     name: 'BackendRegistry',
@@ -3707,6 +3805,22 @@ export const TYPE_API: readonly TypeApiEntry[] = [
   {
     name: 'ContinuableSubagentDescriptorData',
     declaration: 'export interface ContinuableSubagentDescriptorData extends SubagentDescriptorBase {\n    readonly mode: \'continuable\';\n    readonly label: string;\n    readonly agentProvider?: string;\n    readonly agentModel?: string;\n    readonly agentReasoningEffort?: ReasoningEffortId;\n    readonly persona?: string;\n    readonly toolFilter?: ToolRestriction;\n}',
+  },
+  {
+    name: 'CookieAuthenticator',
+    declaration: 'export interface CookieAuthenticator {\n    readonly id: CookieAuthenticatorId;\n    readonly label: string;\n    authenticate(cookie: string, signal?: AbortSignal): Promise<ExternalIdentity | undefined>;\n}',
+  },
+  {
+    name: 'CookieAuthenticatorId',
+    declaration: 'export type CookieAuthenticatorId = Branded<\'CookieAuthenticatorId\'>;',
+  },
+  {
+    name: 'CookieAuthenticatorView',
+    declaration: 'export interface CookieAuthenticatorView {\n    readonly id: CookieAuthenticatorId;\n    readonly label: string;\n}',
+  },
+  {
+    name: 'CookieLoginRequest',
+    declaration: 'export interface CookieLoginRequest {\n    readonly providerId: CookieAuthenticatorId;\n    readonly cookie: string;\n    readonly expiresAt?: number;\n    readonly signal?: AbortSignal;\n}',
   },
   {
     name: 'CordisDynamicPackageId',
@@ -3951,6 +4065,10 @@ export const TYPE_API: readonly TypeApiEntry[] = [
   {
     name: 'EpochHeader',
     declaration: 'export interface EpochHeader {\n    config: LlmCallConfig;\n    adapterDefaults?: LlmCallConfigAdapterDefaults;\n    system?: string;\n    tools?: ToolSchema[];\n}',
+  },
+  {
+    name: 'ExternalIdentity',
+    declaration: 'export interface ExternalIdentity {\n    readonly subject: string;\n    readonly email?: string;\n    readonly displayName?: string;\n    readonly username?: string;\n}',
   },
   {
     name: 'FiberState',
@@ -4473,6 +4591,14 @@ export const TYPE_API: readonly TypeApiEntry[] = [
     declaration: 'export type OptionalSessionSeq = SessionSeq | null;',
   },
   {
+    name: 'PasswordAccountInput',
+    declaration: 'export interface PasswordAccountInput {\n    readonly username: string;\n    readonly password: string;\n    readonly displayName?: string;\n}',
+  },
+  {
+    name: 'PasswordLoginRequest',
+    declaration: 'export interface PasswordLoginRequest {\n    readonly username: string;\n    readonly password: string;\n    readonly expiresAt?: number;\n}',
+  },
+  {
     name: 'PermissionSelect',
     declaration: 'export interface PermissionSelect {\n    options: PresetOption[];\n    currentValue: string;\n}',
   },
@@ -4523,6 +4649,10 @@ export const TYPE_API: readonly TypeApiEntry[] = [
   {
     name: 'PreToolDecision',
     declaration: 'export type PreToolDecision = {\n    kind: \'allow\';\n} | {\n    kind: \'deny\';\n    reason: string;\n} | {\n    kind: \'ask\';\n    reason?: string;\n};',
+  },
+  {
+    name: 'Principal',
+    declaration: 'export interface Principal {\n    readonly accountId: AccountId;\n    readonly userId: UserId;\n    readonly sessionId: AuthSessionId;\n    readonly account: Account;\n    readonly method: AuthMethod;\n    readonly providerId?: CookieAuthenticatorId;\n}',
   },
   {
     name: 'ProjectionChangeListener',
@@ -5919,6 +6049,10 @@ export const TYPE_API: readonly TypeApiEntry[] = [
   {
     name: 'UpdateTeamTaskRequest',
     declaration: 'export interface UpdateTeamTaskRequest {\n    readonly taskId: TeamTaskId;\n    readonly expectedRevision: number;\n    readonly action: TeamTaskAction;\n    readonly subject?: string;\n    readonly description?: string;\n    readonly blockedBy?: readonly TeamTaskId[];\n    readonly writeScopes?: readonly string[];\n    readonly owner?: string;\n}',
+  },
+  {
+    name: 'UserId',
+    declaration: 'export type UserId = Branded<\'UserId\'>;',
   },
   {
     name: 'UserMessage',

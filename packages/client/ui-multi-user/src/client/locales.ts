@@ -1,0 +1,63 @@
+/** `multiUser` namespace dictionaries. */
+
+export const zh = {
+  brand: 'DeepSeek Harness',
+  title: '登录到 DeepSeek Harness',
+  subtitle: '登录后才能使用个人工作站。',
+  username: '用户名',
+  usernamePlaceholder: '输入用户名',
+  displayName: '显示名称（可选）',
+  displayNamePlaceholder: '输入显示名称',
+  password: '密码',
+  passwordPlaceholder: '输入密码',
+  cookie: '第三方 Cookie',
+  cookiePlaceholder: '粘贴第三方 Cookie 字符串',
+  provider: '登录提供方',
+  signIn: '登录',
+  signUp: '创建账户',
+  createFirst: '创建第一个账户',
+  usePassword: '账号密码',
+  useCookie: '第三方登录',
+  noProviders: '暂未配置第三方登录提供方。',
+  loading: '正在检查登录状态…',
+  signingIn: '正在登录…',
+  signingUp: '正在创建账户…',
+  logout: '退出登录',
+  loggingOut: '正在退出…',
+  retry: '重试',
+  required: '请填写必填字段。',
+  cookieHint: 'Cookie 仅用于本次验证，不会保存到工作站。',
+} as const
+
+/** Keys owned by the multi-user UI dictionary. */
+export type MultiUserKey = keyof typeof zh
+
+/** English multi-user UI dictionary. */
+export const en = {
+  brand: 'DeepSeek Harness',
+  title: 'Sign in to DeepSeek Harness',
+  subtitle: 'Sign in to use this personal workstation.',
+  username: 'Username',
+  usernamePlaceholder: 'Enter your username',
+  displayName: 'Display name (optional)',
+  displayNamePlaceholder: 'Enter a display name',
+  password: 'Password',
+  passwordPlaceholder: 'Enter your password',
+  cookie: 'Third-party Cookie',
+  cookiePlaceholder: 'Paste the third-party Cookie string',
+  provider: 'Login provider',
+  signIn: 'Sign in',
+  signUp: 'Create account',
+  createFirst: 'Create the first account',
+  usePassword: 'Password',
+  useCookie: 'Third-party login',
+  noProviders: 'No third-party login providers are configured.',
+  loading: 'Checking your login…',
+  signingIn: 'Signing in…',
+  signingUp: 'Creating account…',
+  logout: 'Sign out',
+  loggingOut: 'Signing out…',
+  retry: 'Retry',
+  required: 'Complete the required fields.',
+  cookieHint: 'The Cookie is used for this verification only and is never stored.',
+} satisfies Record<MultiUserKey, string>
